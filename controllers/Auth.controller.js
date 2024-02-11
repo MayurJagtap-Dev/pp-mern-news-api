@@ -93,7 +93,6 @@ export async function login(req, res) {
   } catch (error) {
     console.log("Error occured : ", error);
     if (error instanceof errors.E_VALIDATION_ERROR) {
-      // console.log(error.messages);
       return res.status(400).json({ errors: error.messages });
     } else {
       return res.status(500).json({
