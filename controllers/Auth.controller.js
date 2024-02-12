@@ -1,4 +1,4 @@
-import prisma from "../db/db.config.js";
+import prisma from "../config/db.config.js";
 import vine, { errors } from "@vinejs/vine";
 import { registerSchema, loginSchema } from "../validations/authValidation.js";
 import bcrypt from "bcryptjs";

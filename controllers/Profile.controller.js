@@ -1,3 +1,6 @@
+import prisma from "../config/db.config.js";
+import { imageValidate, newUUID } from "../utils/image.util.js";
+
 export async function viewProfile(req, res) {
   try {
     const user = req.user;
@@ -11,5 +14,47 @@ export async function viewProfile(req, res) {
 
 export async function updateProfile(req, res) {
   try {
-  } catch (error) {}
+    const { id } = req.params;
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Profile image is required." });
+    }
+
+    const profile = req.files.profile;
+    const message = imageValidate(profile?.size, profile.mimetype);
+    if (message !== "OK") {
+      return res.status(400).json({
+        errors: {
+          profileImage: message,
+        },
+      });
+    }
+
+    const imageName = newUUID() + "." + profile?.name.split(".")[1];
+    const uploadPath = process.cwd() + "/public/images/" + imageName;
+
+    profile.mv(uploadPath, (err) => {
+      if (err) throw err;
+    });
+
+    await prisma.users.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        profile: imageName,
+      },
+    });
+
+    return res.json({
+      status: 200,
+      message: "Profile updated successfully!",
+    });
+  } catch (error) {
+    console.log("Error occured : ", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong, please try again!!" });
+  }
 }
