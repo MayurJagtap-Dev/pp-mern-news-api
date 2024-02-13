@@ -1,7 +1,7 @@
 import prisma from "../config/db.config.js";
 import { imageValidate, newUUID } from "../utils/image.util.js";
 
-export async function viewProfile(req, res) {
+export async function viewUser(req, res) {
   try {
     const user = req.user;
     return res.json({ status: 200, user });

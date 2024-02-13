@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-export default authMiddleware = function (req, res, next) {
+const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (authHeader === null || authHeader === undefined) {
     return res.status(401).json({ status: 401, message: "UnAuthorized" });
@@ -18,3 +18,5 @@ export default authMiddleware = function (req, res, next) {
     next();
   });
 };
+
+export default authMiddleware;
