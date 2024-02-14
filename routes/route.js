@@ -10,6 +10,7 @@ import {
   updateNews,
 } from "../controllers/News.controller.js";
 import authMiddleware from "../middleware/Auth.middleware.js";
+import redisCache from "../config/redis.config.js";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.post("/auth/login", login);
 router.get("/user/", authMiddleware, viewUser);
 router.put("/user/:id", authMiddleware, updateProfile);
 
-router.get("/news", authMiddleware, viewAllNews);
+router.get("/news", authMiddleware, redisCache.route("news"), viewAllNews);
 router.get("/news/user/:userId", authMiddleware, viewNewsByUser);
 router.get("/news/:id", authMiddleware, viewNewsById);
 router.post("/news", authMiddleware, addNews);

@@ -3,6 +3,7 @@ import fs from "fs";
 import prisma from "../config/db.config.js";
 import { newsSchema } from "../validations/newsValidation.js";
 import { imageValidate, newUUID } from "../utils/image.util.js";
+import redisCache from "../config/redis.config.js";
 
 export async function viewAllNews(req, res) {
   try {
@@ -43,6 +44,11 @@ export async function viewAllNews(req, res) {
         message: "News not found.",
       });
     }
+
+    //Remove cache from redis
+    redisCache.del("news", (err) => {
+      if (err) throw err;
+    });
 
     return res.status(200).json({
       status: 200,
