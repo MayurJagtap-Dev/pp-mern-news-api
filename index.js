@@ -5,6 +5,7 @@ import "dotenv/config";
 import api_route from "./routes/route.js";
 import fileupload from "express-fileupload";
 import limiter from "./config/rateLimit.config.js";
+import "./utils/queueIndex.js";
 const PORT = process.env.PORT || 8000;
 
 const app = express();

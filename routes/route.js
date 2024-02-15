@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login } from "../controllers/Auth.controller.js";
+import { register, login, sendMails } from "../controllers/Auth.controller.js";
 import { viewUser, updateProfile } from "../controllers/User.controller.js";
 import {
   viewAllNews,
@@ -16,6 +16,7 @@ const router = Router();
 
 router.post("/auth/register", register);
 router.post("/auth/login", login);
+router.post("/sendmail", authMiddleware, sendMails);
 
 router.get("/user/", authMiddleware, viewUser);
 router.put("/user/:id", authMiddleware, updateProfile);

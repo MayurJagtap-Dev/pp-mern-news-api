@@ -3,6 +3,9 @@ import vine, { errors } from "@vinejs/vine";
 import { registerSchema, loginSchema } from "../validations/authValidation.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import logger from "../config/logger.config.js";
+import { sendMail } from "../config/mailer.js";
+import { emailQueue, emailQueueName } from "../utils/sendMail.util.js";
 
 export async function register(req, res) {
   try {
@@ -27,6 +30,12 @@ export async function register(req, res) {
     const user = await prisma.users.create({
       data: payload,
     });
+
+    await sendMail(
+      payload.email,
+      "Welcome to News API",
+      "<h1>Welcome to News API, You can now access all the latest news updates.</h1>"
+    );
     return res.json({
       status: 200,
       message: "User created successfully",
@@ -34,6 +43,7 @@ export async function register(req, res) {
     });
   } catch (error) {
     console.log("Error occured : ", err);
+    logger.error(error?.message);
     if (error instanceof errors.E_VALIDATION_ERROR) {
       return res.status(400).json({
         errors: error.messages,
@@ -92,6 +102,7 @@ export async function login(req, res) {
     });
   } catch (error) {
     console.log("Error occured : ", error);
+    logger.error(error?.message);
     if (error instanceof errors.E_VALIDATION_ERROR) {
       return res.status(400).json({ errors: error.messages });
     } else {
@@ -100,5 +111,32 @@ export async function login(req, res) {
         message: "Something went wrong, please try again.",
       });
     }
+  }
+}
+
+export async function sendMails(req, res) {
+  try {
+    const { subject, content } = req.body;
+
+    const users = await prisma.users.findMany();
+    const payload = users.map((user) => {
+      return {
+        toMail: user.email,
+        subject: subject,
+        body: content,
+      };
+    });
+
+    await emailQueue.add(emailQueueName, payload);
+
+    return res.json({
+      status: 200,
+      message: "Newsletters scheduled successfully",
+    });
+  } catch (error) {
+    logger.error("Failed to send mails");
+    return res
+      .status(500)
+      .json({ message: "Something went wrong, please try again later." });
   }
 }

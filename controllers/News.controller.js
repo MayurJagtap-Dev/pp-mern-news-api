@@ -4,6 +4,7 @@ import prisma from "../config/db.config.js";
 import { newsSchema } from "../validations/newsValidation.js";
 import { imageValidate, newUUID } from "../utils/image.util.js";
 import redisCache from "../config/redis.config.js";
+import logger from "../config/logger.config.js";
 
 export async function viewAllNews(req, res) {
   try {
@@ -61,6 +62,7 @@ export async function viewAllNews(req, res) {
     });
   } catch (error) {
     console.log("Error occured : ", error);
+    logger.error(error?.message);
     return res.status(500).json({
       status: 500,
       message: error.message,
@@ -99,6 +101,7 @@ export async function viewNewsByUser(req, res) {
     });
   } catch (error) {
     console.log("Error occured : ", error);
+    logger.error(error?.message);
     return res.status(500).json({
       status: 500,
       message: error.message,
@@ -137,6 +140,7 @@ export async function viewNewsById(req, res) {
     });
   } catch (error) {
     console.log("Error occured : ", error);
+    logger.error(error?.message);
     return res.status(500).json({
       status: 500,
       message: error.message,
@@ -179,8 +183,10 @@ export async function addNews(req, res) {
       message: "News created successfully!",
       news,
     });
+    logger.info("News created successfully!");
   } catch (error) {
     console.log("Error occured : ", error);
+    logger.error(error?.message);
     return res.status(500).json({
       status: 500,
       message: error.message,
@@ -245,8 +251,10 @@ export async function updateNews(req, res) {
       status: 200,
       message: "News updated successfully!",
     });
+    logger.info("News updated successfully!");
   } catch (error) {
     console.log("Error occured : ", error);
+    logger.error(error?.message);
     if (error instanceof errors.E_VALIDATION_ERROR) {
       return res.status(400).json({
         errors: error.messages,
@@ -286,8 +294,10 @@ export async function deleteNews(req, res) {
       },
     });
     return res.json({ message: "News deleted successfully!" });
+    logger.info("News deleted successfully!");
   } catch (error) {
     console.log("Error occured : ", error);
+    logger.error(error?.message);
     return res.status(500).json({
       status: 500,
       message: error.message,

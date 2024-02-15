@@ -1,4 +1,5 @@
 import prisma from "../config/db.config.js";
+import logger from "../config/logger.config.js";
 import { imageValidate, newUUID } from "../utils/image.util.js";
 
 export async function viewUser(req, res) {
@@ -51,8 +52,10 @@ export async function updateProfile(req, res) {
       status: 200,
       message: "Profile updated successfully!",
     });
+    logger.info("Profile updated successfully!");
   } catch (error) {
     console.log("Error occured : ", error);
+    logger.error(error?.message);
     return res
       .status(500)
       .json({ message: "Something went wrong, please try again!!" });
